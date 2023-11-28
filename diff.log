@@ -1,0 +1,7 @@
+Key/Value differences under 'person1':
+city:
+  ./src/compare/files/before.yaml: New York
+  ./src/compare/files/after.yaml: New York2
+title:
+  ./src/compare/files/before.yaml: MR
+  ./src/compare/files/after.yaml: undefined

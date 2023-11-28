@@ -19,20 +19,24 @@ async function compareYAMLFiles(file1Path, file2Path, inputKey) {
         const keys1 = data1[inputKey] ? Object.keys(data1[inputKey]) : [];
         const keys2 = data2[inputKey] ? Object.keys(data2[inputKey]) : [];
 
+        const diffLog = [];
         // const allKeys = new Set([...keys1, ...keys2]);
 
-        console.log(`Key/Value differences under '${inputKey}':`);
+        diffLog.push(`Key/Value differences under '${inputKey}':`);
 
         for (const key of keys1) {
             const value1 = data1[inputKey] ? data1[inputKey][key] : undefined;
             const value2 = data2[inputKey] ? data2[inputKey][key] : undefined;
 
             if (value1 !== value2) {
-                console.log(`${key}:`);
-                console.log(`  ${file1Path}: ${value1}`);
-                console.log(`  ${file2Path}: ${value2}`);
+                diffLog.push(`${key}:`);
+                diffLog.push(`  ${file1Path}: ${value1}`);
+                diffLog.push(`  ${file2Path}: ${value2}`);
             }
         }
+
+        // Write differences to diff.log
+        await fsPromises.writeFile('diff.log', diffLog.join('\n'));
     } catch (error) {
         console.error(`Error comparing YAML files: ${error.message}`);
     }
