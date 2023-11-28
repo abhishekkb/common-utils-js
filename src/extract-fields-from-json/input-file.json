@@ -1,0 +1,32 @@
+[
+  {
+    "name": "John Doe",
+    "age": 30,
+    "address": {
+      "street": "123 Main St",
+      "city": "Anytown",
+      "zipcode": "12345"
+    },
+    "email": "johndoe@example.com"
+  },
+  {
+    "name": "Jane Smith",
+    "age": 25,
+    "address": {
+      "street": "123 Main St",
+      "city": "Anytown",
+      "zipcode": "12345"
+    },
+    "email": "Jane.Smith@example.com"
+  },
+  {
+    "name": "Bob Johnson",
+    "age": 40,
+    "address": {
+      "street": "123 Main St",
+      "city": "Anytown",
+      "zipcode": "12345"
+    },
+    "email": "Bob.Johnson@example.com"
+  }
+]
