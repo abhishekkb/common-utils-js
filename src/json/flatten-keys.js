@@ -5,23 +5,23 @@ function flattenKeys(obj, separator = '.') {
 
     let result = {};
 
-    const processObject = (currentObj, parentKey = '') => {
+    const flatten = (currentObj, parentKey = '') => {
         Object.keys(currentObj).forEach(key => {
             const currKey = parentKey ? `${parentKey}${separator}${key}` : key;
             const currVal = currentObj[key];
             if (Array.isArray(currVal) && currVal.length > 0) {
                 currVal.forEach((val, i) => {
-                    processObject(val, `${currKey}${separator}${i}`);
+                    flatten(val, `${currKey}${separator}${i}`);
                 });
             } else if (typeof currVal === 'object' && currVal !== null) {
-                processObject(currVal, currKey);
+                flatten(currVal, currKey);
             } else {
                 result[currKey] = currVal;
             }
         });
     };
 
-    processObject(obj);
+    flatten(obj);
 
     return result;
 }
