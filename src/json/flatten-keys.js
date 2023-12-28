@@ -1,23 +1,22 @@
 function flattenKeys(obj, separator = '.') {
+    if(!obj) {
+        return {};
+    }
+
     let result = {};
 
     const processObject = (currentObj, parentKey = '') => {
         Object.keys(currentObj).forEach(key => {
-            const currentKey = parentKey ? `${parentKey}${separator}${key}` : key;
-
-            if (Array.isArray(currentObj[key])) {
-                currentObj[key].forEach((item, index) => {
-                    const arrayKey = `${currentKey}${separator}${index}`;
-                    if (typeof item === 'object' && item !== null) {
-                        processObject(item, arrayKey);
-                    } else {
-                        result[arrayKey] = item;
-                    }
+            const currKey = parentKey ? `${parentKey}${separator}${key}` : key;
+            const currVal = currentObj[key];
+            if (Array.isArray(currVal) && currVal.length > 0) {
+                currVal.forEach((val, i) => {
+                    processObject(val, `${currKey}${separator}${i}`);
                 });
-            } else if (typeof currentObj[key] === 'object' && currentObj[key] !== null) {
-                processObject(currentObj[key], currentKey);
+            } else if (typeof currVal === 'object' && currVal !== null) {
+                processObject(currVal, currKey);
             } else {
-                result[currentKey] = currentObj[key];
+                result[currKey] = currVal;
             }
         });
     };
@@ -27,8 +26,7 @@ function flattenKeys(obj, separator = '.') {
     return result;
 }
 
-// Example usage:
-const nestedJsonDataWithArrays = {
+const jsonData = {
     user: {
         name: 'John',
         addresses: [
@@ -58,6 +56,4 @@ const nestedJsonDataWithArrays = {
     },
 };
 
-const flattenedKeysWithArrays = flattenKeys(nestedJsonDataWithArrays);
-
-console.log(flattenedKeysWithArrays);
+console.log(flattenKeys(jsonData));
