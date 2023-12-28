@@ -1,4 +1,4 @@
-function flattenKeys(obj, parentKey = '', separator = '_') {
+function flattenKeys(obj, parentKey = '', separator = '.') {
     let result = {};
 
     for (const key in obj) {
@@ -6,11 +6,9 @@ function flattenKeys(obj, parentKey = '', separator = '_') {
             const currentKey = parentKey ? `${parentKey}${separator}${key}` : key;
 
             if (typeof obj[key] === 'object' && obj[key] !== null) {
-                // Recursively flatten nested objects
                 const nestedKeys = flattenKeys(obj[key], currentKey, separator);
                 result = { ...result, ...nestedKeys };
             } else {
-                // Flatten current key
                 result[currentKey] = obj[key];
             }
         }
