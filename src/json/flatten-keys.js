@@ -11,7 +11,11 @@ function flattenKeys(obj, separator = '.') {
             const currVal = currentObj[key];
             if (Array.isArray(currVal) && currVal.length > 0) {
                 currVal.forEach((val, i) => {
-                    flatten(val, `${currKey}${separator}${i}`);
+                    if (typeof val === 'object' && val !== null) {
+                        flatten(val, `${currKey}${separator}${i}`);
+                    } else {
+                        result[`${currKey}${separator}${i}`] = val
+                    }
                 });
             } else if (typeof currVal === 'object' && currVal !== null) {
                 flatten(currVal, currKey);
