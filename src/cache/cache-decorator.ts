@@ -7,10 +7,8 @@ export function CacheOutput(cacheKey: string, ttl: number) {
             const currentTime = Date.now();
             const cacheEntry = cache[cacheKey];
             if (cacheEntry && currentTime < cacheEntry.expiry) {
-                console.log(`Cache hit for ${cacheKey}`);
                 return cacheEntry.value;
             } else {
-                console.log(`Cache miss for ${cacheKey}`);
                 const result = await originalMethod.apply(this, args);
                 cache[cacheKey] = { value: result, expiry: currentTime + ttl };
                 return result;
