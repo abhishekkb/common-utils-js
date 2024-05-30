@@ -8,7 +8,6 @@ const columnMappings = {
         'Original Column 3': 'nested.customKey3',
         'Original Column 4': { arrayField: 'arrayFieldName', key: 'arrayObjectKey1' },
         'Original Column 5': { arrayField: 'arrayFieldName', key: 'arrayObjectKey2' }
-        // Add mappings for all columns as needed
     },
     'Custom Sheet Name 2': {
         'Original Column 1': 'customKeyA',
@@ -16,7 +15,6 @@ const columnMappings = {
         'Original Column 3': 'nested.customKeyC',
         'Original Column 4': { arrayField: 'arrayFieldName', key: 'arrayObjectKeyA' },
         'Original Column 5': { arrayField: 'arrayFieldName', key: 'arrayObjectKeyB' }
-        // Add mappings for all columns as needed
     },
     'Custom Sheet Name 3': {
         'Original Column 1': 'customKeyX',
@@ -24,7 +22,6 @@ const columnMappings = {
         'Original Column 3': 'nested.customKeyZ',
         'Original Column 4': { arrayField: 'arrayFieldName', key: 'arrayObjectKeyX' },
         'Original Column 5': { arrayField: 'arrayFieldName', key: 'arrayObjectKeyY' }
-        // Add mappings for all columns as needed
     }
 };
 
@@ -53,9 +50,13 @@ function setArrayField(obj, arrayField, key, value) {
     arrayObject[key] = value;
 }
 
+function normalizeHeader(header) {
+    return header.replace(/\r?\n|\r/g, ' ').trim();
+}
+
 function sheetToJson(worksheet, mappings) {
     const data = xlsx.utils.sheet_to_json(worksheet, { defval: null, header: 1 });
-    const headers = data[0];
+    const headers = data[0].map(normalizeHeader);
     const rows = data.slice(1);
 
     return rows.map(row => {
@@ -68,7 +69,7 @@ function sheetToJson(worksheet, mappings) {
             } else if (mapping && typeof mapping === 'object') {
                 setArrayField(mappedRow, mapping.arrayField, mapping.key, value);
             } else {
-                mappedRow[header] = value; // if there's no mapping, keep the original key
+                mappedRow[header] = value;
             }
         });
         return mappedRow;
