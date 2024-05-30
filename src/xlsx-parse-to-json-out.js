@@ -2,29 +2,29 @@ const xlsx = require('xlsx');
 const fs = require('fs');
 
 const columnMappings = {
-    Sheet1: {
+    'Custom Sheet Name 1': {
         'Original Column 1': 'customKey1',
         'Original Column 2': 'customKey2',
         'Original Column 3': 'nested.customKey3',
         'Original Column 4': { arrayField: 'arrayFieldName', key: 'arrayObjectKey1' },
         'Original Column 5': { arrayField: 'arrayFieldName', key: 'arrayObjectKey2' }
-        // Add mappings for all 20 columns
+        // Add mappings for all columns as needed
     },
-    Sheet2: {
+    'Custom Sheet Name 2': {
         'Original Column 1': 'customKeyA',
         'Original Column 2': 'customKeyB',
         'Original Column 3': 'nested.customKeyC',
         'Original Column 4': { arrayField: 'arrayFieldName', key: 'arrayObjectKeyA' },
         'Original Column 5': { arrayField: 'arrayFieldName', key: 'arrayObjectKeyB' }
-        // Add mappings for all 20 columns
+        // Add mappings for all columns as needed
     },
-    Sheet3: {
+    'Custom Sheet Name 3': {
         'Original Column 1': 'customKeyX',
         'Original Column 2': 'customKeyY',
         'Original Column 3': 'nested.customKeyZ',
         'Original Column 4': { arrayField: 'arrayFieldName', key: 'arrayObjectKeyX' },
         'Original Column 5': { arrayField: 'arrayFieldName', key: 'arrayObjectKeyY' }
-        // Add mappings for all 20 columns
+        // Add mappings for all columns as needed
     }
 };
 
@@ -54,19 +54,23 @@ function setArrayField(obj, arrayField, key, value) {
 }
 
 function sheetToJson(worksheet, mappings) {
-    const data = xlsx.utils.sheet_to_json(worksheet, { defval: null });
-    return data.map(row => {
+    const data = xlsx.utils.sheet_to_json(worksheet, { defval: null, header: 1 });
+    const headers = data[0];
+    const rows = data.slice(1);
+
+    return rows.map(row => {
         const mappedRow = {};
-        for (const originalKey in row) {
-            const mapping = mappings[originalKey];
+        headers.forEach((header, index) => {
+            const value = row[index];
+            const mapping = mappings[header];
             if (typeof mapping === 'string') {
-                setNestedField(mappedRow, mapping, row[originalKey]);
+                setNestedField(mappedRow, mapping, value);
             } else if (mapping && typeof mapping === 'object') {
-                setArrayField(mappedRow, mapping.arrayField, mapping.key, row[originalKey]);
+                setArrayField(mappedRow, mapping.arrayField, mapping.key, value);
             } else {
-                mappedRow[originalKey] = row[originalKey]; // if there's no mapping, keep the original key
+                mappedRow[header] = value; // if there's no mapping, keep the original key
             }
-        }
+        });
         return mappedRow;
     });
 }
