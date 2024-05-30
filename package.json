@@ -12,7 +12,8 @@
   "dependencies": {
     "js-yaml": "^4.1.0",
     "jsonpath": "^1.1.1",
-    "pretty-js": "^0.2.2"
+    "pretty-js": "^0.2.2",
+    "xlsx": "^0.18.5"
   },
   "type": "module"
 }
