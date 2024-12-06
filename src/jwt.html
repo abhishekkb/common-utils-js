@@ -23,6 +23,10 @@
             box-sizing: border-box;
             border: 1px solid #ddd;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
         }
         .input-panel {
             background: #f7f7f7;
@@ -30,15 +34,21 @@
         .output-panel {
             background: #fff;
         }
-        textarea {
+        .decoded-panel {
+            background: #eef7ff;
+        }
+        textarea, pre {
             width: 100%;
-            height: calc(100% - 40px);
+            height: 70%;
             font-size: 14px;
             line-height: 1.5;
             border: 1px solid #ddd;
             border-radius: 4px;
             padding: 10px;
             box-sizing: border-box;
+        }
+        textarea {
+            resize: none;
         }
         pre {
             white-space: pre-wrap;
@@ -47,53 +57,80 @@
             padding: 10px;
             border-radius: 4px;
         }
-        h2 {
-            margin-top: 0;
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            margin: 10px 0;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 </head>
 <body>
     <div class="container">
         <!-- Input Panel -->
         <div class="panel input-panel">
-            <h2>Input (Base64 Encoded JWT)</h2>
-            <textarea id="jwtInput" placeholder="Paste your Base64-encoded JWT here"></textarea>
+            <h2>Input (Base64)</h2>
+            <textarea id="base64Input" placeholder="Paste your Base64-encoded string here"></textarea>
+            <button id="decodeBase64">Decode Base64</button>
         </div>
 
-        <!-- Output Panel -->
+        <!-- Decoded Base64 Panel -->
         <div class="panel output-panel">
-            <h2>Output (Decoded JWT)</h2>
-            <div id="jwtOutput">
-                <pre id="headerOutput">Header: </pre>
-                <pre id="payloadOutput">Payload: </pre>
-            </div>
+            <h2>Decoded JSON</h2>
+            <pre id="decodedJson">Decoded JSON will appear here</pre>
+            <button id="extractJwt">Extract & Decode JWT</button>
+        </div>
+
+        <!-- Decoded JWT Panel -->
+        <div class="panel decoded-panel">
+            <h2>Decoded JWT</h2>
+            <pre id="decodedJwt">Decoded JWT will appear here</pre>
         </div>
     </div>
 
     <script>
-        document.getElementById('jwtInput').addEventListener('input', () => {
-            const input = document.getElementById('jwtInput').value.trim();
-            const headerOutput = document.getElementById('headerOutput');
-            const payloadOutput = document.getElementById('payloadOutput');
-
-            if (!input) {
-                headerOutput.textContent = "Header: ";
-                payloadOutput.textContent = "Payload: ";
-                return;
-            }
+        // Base64 decoding
+        document.getElementById('decodeBase64').addEventListener('click', () => {
+            const base64Input = document.getElementById('base64Input').value.trim();
+            const decodedJson = document.getElementById('decodedJson');
 
             try {
-                // Decode JWT
-                const [header, payload] = input.split('.').map(part => {
-                    const decoded = atob(part);
-                    return JSON.stringify(JSON.parse(decoded), null, 2);
-                });
-
-                headerOutput.textContent = `Header: ${header}`;
-                payloadOutput.textContent = `Payload: ${payload}`;
+                const decodedString = atob(base64Input);
+                const json = JSON.parse(decodedString);
+                decodedJson.textContent = JSON.stringify(json, null, 2);
             } catch (e) {
-                headerOutput.textContent = "Header: Invalid JWT";
-                payloadOutput.textContent = "Payload: Invalid JWT";
+                decodedJson.textContent = "Invalid Base64 or JSON format.";
+            }
+        });
+
+        // Extract JWT and decode using jwt-decode
+        document.getElementById('extractJwt').addEventListener('click', () => {
+            const decodedJson = document.getElementById('decodedJson').textContent;
+            const decodedJwt = document.getElementById('decodedJwt');
+
+            try {
+                const jsonObject = JSON.parse(decodedJson);
+                const jwt = jsonObject.jwt;
+
+                if (!jwt) {
+                    throw new Error("JWT field not found.");
+                }
+
+                // Decode JWT using jwt-decode
+                const decodedToken = jwt_decode(jwt);
+
+                // Display decoded JWT
+                decodedJwt.textContent = JSON.stringify(decodedToken, null, 2);
+            } catch (e) {
+                decodedJwt.textContent = "Error decoding JWT or invalid input." + e.message;
             }
         });
     </script>
