@@ -7,11 +7,9 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
             display: flex;
             height: 100vh;
-            overflow: hidden;
+            margin: 0;
         }
         .container {
             display: flex;
@@ -19,48 +17,24 @@
         }
         .panel {
             flex: 1;
-            padding: 20px;
+            padding: 10px;
             box-sizing: border-box;
-            border: 1px solid #ddd;
-            overflow-y: auto;
+            border: 1px solid #ccc;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .input-panel {
-            background: #f7f7f7;
-        }
-        .output-panel {
-            background: #fff;
-        }
-        .decoded-panel {
-            background: #eef7ff;
+            gap: 10px;
         }
         textarea, pre {
             width: 100%;
             height: 70%;
-            font-size: 14px;
-            line-height: 1.5;
-            border: 1px solid #ddd;
-            border-radius: 4px;
             padding: 10px;
             box-sizing: border-box;
-        }
-        textarea {
+            border: 1px solid #ccc;
+            border-radius: 4px;
             resize: none;
         }
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            background: #eee;
-            padding: 10px;
-            border-radius: 4px;
-        }
         button {
-            padding: 10px 20px;
-            font-size: 14px;
-            margin: 10px 0;
+            padding: 10px;
             cursor: pointer;
             border: none;
             border-radius: 4px;
@@ -70,69 +44,56 @@
         button:hover {
             background-color: #0056b3;
         }
+        h2 {
+            margin: 0;
+            text-align: center;
+            font-size: 16px;
+        }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        <!-- Input Panel -->
-        <div class="panel input-panel">
-            <h2>Input (Base64)</h2>
-            <textarea id="base64Input" placeholder="Paste your Base64-encoded string here"></textarea>
-            <button id="decodeBase64">Decode Base64</button>
-        </div>
+    <script type="module">
+        import { decodeBase64ToJson, decodeJwtField } from './jwt-util.js';
 
-        <!-- Decoded Base64 Panel -->
-        <div class="panel output-panel">
-            <h2>Decoded JSON</h2>
-            <pre id="decodedJson">Decoded JSON will appear here</pre>
-            <button id="extractJwt">Extract & Decode JWT</button>
-        </div>
-
-        <!-- Decoded JWT Panel -->
-        <div class="panel decoded-panel">
-            <h2>Decoded JWT</h2>
-            <pre id="decodedJwt">Decoded JWT will appear here</pre>
-        </div>
-    </div>
-
-    <script>
-        // Base64 decoding
         document.getElementById('decodeBase64').addEventListener('click', () => {
             const base64Input = document.getElementById('base64Input').value.trim();
             const decodedJson = document.getElementById('decodedJson');
 
             try {
-                const decodedString = atob(base64Input);
-                const json = JSON.parse(decodedString);
+                const json = decodeBase64ToJson(base64Input);
                 decodedJson.textContent = JSON.stringify(json, null, 2);
-            } catch (e) {
-                decodedJson.textContent = "Invalid Base64 or JSON format.";
+            } catch (error) {
+                decodedJson.textContent = error.message;
             }
         });
 
-        // Extract JWT and decode using jwt-decode
         document.getElementById('extractJwt').addEventListener('click', () => {
             const decodedJson = document.getElementById('decodedJson').textContent;
             const decodedJwt = document.getElementById('decodedJwt');
 
             try {
-                const jsonObject = JSON.parse(decodedJson);
-                const jwt = jsonObject.jwt;
-
-                if (!jwt) {
-                    throw new Error("JWT field not found.");
-                }
-
-                // Decode JWT using jwt-decode
-                const decodedToken = jwt_decode(jwt);
-
-                // Display decoded JWT
+                const decodedToken = decodeJwtField(decodedJson);
                 decodedJwt.textContent = JSON.stringify(decodedToken, null, 2);
-            } catch (e) {
-                decodedJwt.textContent = "Error decoding JWT or invalid input." + e.message;
+            } catch (error) {
+                decodedJwt.textContent = error.message;
             }
         });
     </script>
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <h2>Input (Base64)</h2>
+            <textarea id="base64Input" placeholder="Paste Base64 string"></textarea>
+            <button id="decodeBase64">Decode Base64</button>
+        </div>
+        <div class="panel">
+            <h2>Decoded JSON</h2>
+            <pre id="decodedJson">Decoded JSON will appear here</pre>
+            <button id="extractJwt">Extract & Decode JWT</button>
+        </div>
+        <div class="panel">
+            <h2>Decoded JWT</h2>
+            <pre id="decodedJwt">Decoded JWT will appear here</pre>
+        </div>
+    </div>
 </body>
 </html>
