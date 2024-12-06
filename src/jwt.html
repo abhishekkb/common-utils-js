@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Decoder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+        }
+        .panel {
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            overflow-y: auto;
+        }
+        .input-panel {
+            background: #f7f7f7;
+        }
+        .output-panel {
+            background: #fff;
+        }
+        textarea {
+            width: 100%;
+            height: calc(100% - 40px);
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #eee;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Input Panel -->
+        <div class="panel input-panel">
+            <h2>Input (Base64 Encoded JWT)</h2>
+            <textarea id="jwtInput" placeholder="Paste your Base64-encoded JWT here"></textarea>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="panel output-panel">
+            <h2>Output (Decoded JWT)</h2>
+            <div id="jwtOutput">
+                <pre id="headerOutput">Header: </pre>
+                <pre id="payloadOutput">Payload: </pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('jwtInput').addEventListener('input', () => {
+            const input = document.getElementById('jwtInput').value.trim();
+            const headerOutput = document.getElementById('headerOutput');
+            const payloadOutput = document.getElementById('payloadOutput');
+
+            if (!input) {
+                headerOutput.textContent = "Header: ";
+                payloadOutput.textContent = "Payload: ";
+                return;
+            }
+
+            try {
+                // Decode JWT
+                const [header, payload] = input.split('.').map(part => {
+                    const decoded = atob(part);
+                    return JSON.stringify(JSON.parse(decoded), null, 2);
+                });
+
+                headerOutput.textContent = `Header: ${header}`;
+                payloadOutput.textContent = `Payload: ${payload}`;
+            } catch (e) {
+                headerOutput.textContent = "Header: Invalid JWT";
+                payloadOutput.textContent = "Payload: Invalid JWT";
+            }
+        });
+    </script>
+</body>
+</html>
